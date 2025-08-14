@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>COLIBRI</title>
+  <style>
+    :root{
+      --bg1:#0b0b12; --bg2:#1b0f2b; --accent:#00f0ff; --accent2:#ff5e5b; --gold:#ffd166; --ok:#21c55d; --warn:#f59e0b; --text:#eaeaf2;
+      --card:#13131d; --muted:#9aa0a6; --glow:0 0 12px rgba(0,240,255,.35), 0 0 28px rgba(255,94,91,.15);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(80% 120% at 10% 0%, #101026 0%, #09090f 40%) ,
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      background-attachment: fixed;
+      overflow-x:hidden;
+      animation: fadeIn .7s ease-out both;
+    }
+    @keyframes fadeIn{from{opacity:.0; transform:translateY(6px)} to{opacity:1; transform:none}}
+
+    /* Header */
+    .header{position:sticky; top:0; z-index:50; backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(10,10,18,.7), rgba(10,10,18,.3));
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .wrap{max-width:1200px; margin:0 auto; padding:14px 18px;}
+    .row{display:flex; align-items:center; gap:14px}
+    .logo{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .logo .mark{width:28px; height:28px; border-radius:8px; background:
+      conic-gradient(from 90deg, var(--accent), var(--accent2), #8a2be2, var(--accent));
+      box-shadow: var(--glow);
+    }
+    nav{margin-left:18px; display:flex; gap:14px; flex:1; flex-wrap:wrap}
+    nav a{padding:8px 12px; border-radius:999px; color:var(--text); text-decoration:none; font-weight:600; font-size:14px;
+      border:1px solid rgba(255,255,255,.06); opacity:.9}
+    nav a:hover{box-shadow:0 0 0 1px rgba(255,255,255,.12), var(--glow); opacity:1}
+
+    .spacer{flex:1}
+    .btn{background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--text); padding:10px 16px; border-radius:12px; cursor:pointer; font-weight:700}
+    .btn:hover{box-shadow:var(--glow); border-color:rgba(255,255,255,.3)}
+    .btn.primary{background: linear-gradient(90deg, var(--accent2), #ff8a5b); border-color:transparent}
+    .btn.primary:hover{filter:brightness(1.05)}
+
+    /* Hero */
+    .hero{position:relative; margin:18px auto 10px; max-width:1200px; padding:18px}
+    .hero-inner{border-radius:var(--radius); padding:26px; overflow:hidden; border:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(120deg, rgba(0,240,255,.08), rgba(255,94,91,.08)) ,
+                  radial-gradient(1200px 400px at 0% 100%, rgba(0,240,255,.18), transparent 60%),
+                  linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      box-shadow: 0 10px 40px rgba(0,0,0,.45);
+    }
+    .hero h1{margin:0 0 6px; font-size:34px}
+    .hero p{margin:0 0 14px; color:var(--muted)}
+    .bonus{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+    .pill{border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:700}
+    .pill.gold{background:linear-gradient(120deg, #7a5c12, #dab760); color:#130f0a; border:none; box-shadow:0 3px 16px rgba(218,183,96,.35)}
+
+    /* Filters */
+    .filters{max-width:1200px; margin:8px auto 0; padding:0 18px 6px; display:flex; gap:10px; flex-wrap:wrap}
+    .chip{font-size:14px; padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.12); cursor:pointer; user-select:none}
+    .chip.active, .chip:hover{box-shadow:var(--glow)}
+
+    /* Grid */
+    .grid{max-width:1200px; margin:10px auto 60px; padding:0 18px; display:grid; grid-template-columns: repeat( auto-fill, minmax(180px,1fr)); gap:14px}
+    .card{background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:16px; overflow:hidden; position:relative}
+    .thumb{aspect-ratio: 16/10; background: linear-gradient(135deg, #19202a, #11151b); position:relative}
+    .thumb:after{content:""; position:absolute; inset:0; background: radial-gradient(60% 60% at 70% 30%, rgba(0,240,255,.18), transparent),
+      radial-gradient(60% 60% at 30% 70%, rgba(255,94,91,.18), transparent);
+      mix-blend: screen;}
+    .title{padding:10px 12px; font-weight:700; display:flex; justify-content:space-between; align-items:center}
+    .fav{border:none; background:transparent; cursor:pointer; font-size:18px; opacity:.7}
+    .fav.active{opacity:1; filter:drop-shadow(0 0 8px #ff5e5b)}
+    .play{position:absolute; bottom:10px; left:50%; transform:translateX(-50%); padding:10px 14px; border-radius:12px; border:none; cursor:pointer; font-weight:800;
+      background:linear-gradient(90deg, var(--accent), #8a2be2); color:#041014; box-shadow:var(--glow); opacity:0; pointer-events:none; transition:.2s}
+    .card:hover .play{opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(-3px)}
+
+    /* Sticky promo */
+    .promo{position:fixed; bottom:12px; left:50%; transform:translateX(-50%); z-index:40; display:flex; gap:10px; align-items:center;
+      background:linear-gradient(90deg, rgba(0,240,255,.12), rgba(255,94,91,.12)); border:1px solid rgba(255,255,255,.12);
+      padding:10px 14px; border-radius:999px; backdrop-filter: blur(8px)}
+    .promo b{color:var(--gold)}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.07); padding:30px 18px; background:linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.35))}
+    .foot{max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:18px}
+    .foot small{color:var(--muted)}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid rgba(255,255,255,.12); border-radius:999px}
+
+    /* Modals */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(5,6,10,.66); backdrop-filter: blur(8px); z-index:60}
+    .modal.active{display:grid}
+    .modal-card{width: min(520px, 92vw); background:var(--card); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:20px; box-shadow:0 20px 70px rgba(0,0,0,.6)}
+    .modal h3{margin:0 0 6px}
+    .field{display:flex; flex-direction:column; gap:6px; margin:10px 0}
+    .input{padding:12px 14px; border-radius:12px; background:#0f0f16; border:1px solid rgba(255,255,255,.12); color:var(--text)}
+
+    /* Wallet */
+    .wallet{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:12px; background:#111622; border:1px solid rgba(255,255,255,.1)}
+
+    @media (max-width:860px){
+      .foot{grid-template-columns:1fr}
+      nav{display:none}
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="wrap row">
+      <div class="logo"><span class="mark"></span><span>COLIBRI</span></div>
+      <nav>
+        <a href="#">Слоты</a>
+        <a href="#">Live</a>
+        <a href="#">Промо</a>
+        <a href="#">Турниры</a>
+        <a href="#">Помощь</a>
+      </nav>
+      <div class="spacer"></div>
+      <div id="wallet" class="wallet" style="display:none">
+        <span>Баланс:</span>
+        <b id="balance">₸0</b>
+        <button class="btn" id="topup">Пополнить (демо)</button>
+        <button class="btn" id="logout">Выйти</button>
+      </div>
+      <div id="authBtns">
+        <button class="btn" id="loginBtn">Вход</button>
+        <button class="btn primary" id="regBtn">Регистрация</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>Бонус до <span class="pill gold">150% + 100 FS</span></h1>
+      <p>Демо-витрина. Никаких реальных ставок. Интерфейс и анимации — да; платежей — нет.</p>
+      <div class="bonus">
+        <span class="pill">Еженедельный кешбэк до 10%</span>
+        <span class="pill">Турниры с призовым фондом (демо)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <div class="filters" id="filters">
+    <div class="chip active" data-cat="popular">Популярное</div>
+    <div class="chip" data-cat="new">Новинки</div>
+    <div class="chip" data-cat="slots">Слоты</div>
+    <div class="chip" data-cat="live">Live</div>
+    <div class="chip" data-cat="table">Настольные</div>
+    <div class="chip" data-cat="jackpot">Джекпот</div>
+  </div>
+
+  <!-- Grid -->
+  <main class="grid" id="grid"></main>
+
+  <!-- Sticky promo -->
+  <div class="promo" id="promo">
+    <span>🎁 Получи демо-бонус <b>₸5 000</b> после регистрации</span>
+    <button class="btn" id="claim">Забрать</button>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="foot">
+      <div>
+        <b>О проекте</b>
+        <p>Это <u>оригинальный</u> демо-шаблон в стиле неонового казино. Он не является клоном какого-либо бренда и не поддерживает реальные ставки.</p>
+        <div class="badge">18+ Ответственная игра • Демо-режим</div>
+      </div>
+      <div>
+        <b>Правила</b>
+        <small>Используя сайт, вы соглашаетесь с правилами демо-среды. Реальные платежи, вывод средств и азартные услуги отсутствуют.</small>
+      </div>
+      <div>
+        <b>Поддержка</b>
+        <small>Вопросы по шаблону: support@example.com</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+  <div class="modal" id="authModal">
+    <div class="modal-card">
+      <h3 id="authTitle">Вход</h3>
+      <div class="field">
+        <label>Email</label>
+        <input class="input" type="email" id="email" placeholder="you@email.com"/>
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <input class="input" type="password" id="pass" placeholder="••••••••"/>
+      </div>
+      <div class="row" style="justify-content:flex-end; gap:10px">
+        <button class="btn" id="cancelAuth">Отмена</button>
+        <button class="btn primary" id="submitAuth">Продолжить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="ageModal">
+    <div class="modal-card">
+      <h3>Подтверждение возраста</h3>
+      <p>Этот демо-шаблон предназначен для пользователей 18+. Продолжая, вы подтверждаете, что вам исполнилось 18 лет.</p>
+      <div class="row" style="justify-content:flex-end; gap:10px">
+        <button class="btn" id="ageDecline">Мне нет 18</button>
+        <button class="btn primary" id="ageAccept">Мне 18+</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Demo data
+    const games = Array.from({length: 12}).map((_,i)=>({
+      id:i+1,
+      title: `Game ${i+1}`,
+      cat: ['popular','slots','table','new','live','jackpot'][i%6]
+    }));
+
+    // ---- Render grid
+    const grid = document.getElementById('grid');
+    function renderGrid(cat='popular'){
+      grid.innerHTML = '';
+      games.filter(g=> cat==='popular' ? true : g.cat===cat)
+        .forEach(g=>{
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="thumb"></div>
+            <div class="title">${g.title}
+              <button class="fav" aria-label="favorite">❤</button>
+            </div>
+            <button class="play" data-id="${g.id}">Играть (демо)</button>
+          `;
+          grid.appendChild(card);
+        })
+    }
+    renderGrid();
+
+    // ---- Filters
+    document.getElementById('filters').addEventListener('click', (e)=>{
+      const chip = e.target.closest('.chip'); if(!chip) return;
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      renderGrid(chip.dataset.cat);
+    });
+
+    // ---- Auth & Wallet (demo localStorage)
+    const authModal = document.getElementById('authModal');
+    const authBtns  = document.getElementById('authBtns');
+    const walletBox = document.getElementById('wallet');
+    const balanceEl = document.getElementById('balance');
+
+    function openModal(m){ m.classList.add('active'); }
+    function closeModal(m){ m.classList.remove('active'); }
+
+    function isAuthed(){ return !!localStorage.getItem('demo_user'); }
+    function getBalance(){ return Number(localStorage.getItem('demo_balance')||0); }
+    function setBalance(v){ localStorage.setItem('demo_balance', v); balanceEl.textContent = `₸${v.toLocaleString('ru-RU')}`; }
+
+    function syncAuthUI(){
+      if(isAuthed()){
+        authBtns.style.display='none';
+        walletBox.style.display='flex';
+        setBalance(getBalance());
+      } else {
+        authBtns.style.display='block';
+        walletBox.style.display='none';
+      }
+    }
+
+    document.getElementById('loginBtn').onclick = ()=>{ document.getElementById('authTitle').textContent='Вход'; openModal(authModal); };
+    document.getElementById('regBtn').onclick   = ()=>{ document.getElementById('authTitle').textContent='Регистрация'; openModal(authModal); };
+    document.getElementById('cancelAuth').onclick= ()=> closeModal(authModal);
+    document.getElementById('submitAuth').onclick= ()=>{
+      const email = document.getElementById('email').value.trim();
+      if(!email){ alert('Введите email'); return; }
+      localStorage.setItem('demo_user', email);
+      if(!localStorage.getItem('demo_balance')) setBalance(0);
+      closeModal(authModal); syncAuthUI();
+    };
+    document.getElementById('logout').onclick = ()=>{ localStorage.removeItem('demo_user'); syncAuthUI(); };
+    document.getElementById('topup').onclick  = ()=>{ setBalance(getBalance()+1000); };
+
+    // ---- Promo claim
+    document.getElementById('claim').onclick = ()=>{
+      if(!isAuthed()) { openModal(authModal); return; }
+      setBalance(getBalance()+5000);
+      document.getElementById('promo').style.display='none';
+    };
+
+    // ---- Play demo buttons
+    grid.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.play'); if(!btn) return;
+      if(!isAuthed()) { openModal(authModal); return; }
+      alert('Запущен демо-режим игры #' + btn.dataset.id + '\n(реальные ставки отсутствуют)');
+    });
+
+    // ---- Favorites
+    grid.addEventListener('click', (e)=>{
+      const fav = e.target.closest('.fav'); if(!fav) return; fav.classList.toggle('active');
+    });
+
+    // ---- Age gate
+    const ageModal = document.getElementById('ageModal');
+    if(!localStorage.getItem('age_ok')){ openModal(ageModal); }
+    document.getElementById('ageAccept').onclick = ()=>{ localStorage.setItem('age_ok','1'); closeModal(ageModal); };
+    document.getElementById('ageDecline').onclick= ()=>{ location.href='https://www.google.com'; };
+
+    // Init
+    syncAuthUI();
+  </script>
+</body>
+</html>
